@@ -32,8 +32,12 @@ app.use(helmet({
   },
 }));
 
-// CORS - Configuración estricta
+// CORS - Configuración flexible para Vercel y otros dominios
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
+
+// Regex para permitir todos los subdominios de Vercel
+const vercelPattern = /\.vercel\.app$/;
+
 app.use(cors({
   origin: (origin, callback) => {
     // Permitir requests sin origin (como Postman) en desarrollo
@@ -41,11 +45,17 @@ app.use(cors({
       return callback(null, true);
     }
     
+    // Verificar si está en la lista de orígenes permitidos
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
+      return callback(null, true);
     }
+    
+    // Verificar si es un dominio de Vercel (preview deployments)
+    if (origin && vercelPattern.test(origin)) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('No permitido por CORS'));
   },
   credentials: true,
   methods: ['POST', 'GET', 'OPTIONS'],
