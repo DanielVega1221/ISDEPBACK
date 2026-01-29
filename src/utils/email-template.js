@@ -153,7 +153,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
               
               <table width="100%" cellpadding="8" cellspacing="0">
                 <tr style="border-bottom: 1px solid #e9ecef;">
-                  <td style="color: #6c757d; font-size: 14px; font-weight: 600; width: 40%;">Profesión/Ocupación:</td>
+                  <td style="color: #6c757d; font-size: 14px; font-weight: 600; width: 40%;">Nivel de educación:</td>
                   <td style="color: #2d3561; font-size: 15px; font-weight: 500;">${profesion}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #e9ecef;">

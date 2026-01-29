@@ -185,10 +185,6 @@ const enviarConfirmacionEstudiante = async (resend, formData) => {
               <p style="margin: 0 0 10px 0; font-size: 14px;">
                 <strong style="color: #ffffff;">Instituto ISDEP</strong>
               </p>
-              <p style="margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                📧 isdep@hotmail.com.ar • 📱 +54 9 223 674-1300<br>
-                🌐 www.institutoisdep.com.ar
-              </p>
             </td>
           </tr>
 
