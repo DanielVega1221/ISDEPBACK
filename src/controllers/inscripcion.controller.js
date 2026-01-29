@@ -22,7 +22,9 @@ export const enviarInscripcion = async (req, res) => {
     // 3. Preparar archivos adjuntos
     const attachments = [];
     if (req.files && req.files.length > 0) {
-      console.log(`📎 Procesando ${req.files.length} archivo(s) adjunto(s)...`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`📎 Procesando ${req.files.length} archivo(s) adjunto(s)...`);
+      }
       
       for (const file of req.files) {
         try {
@@ -31,7 +33,9 @@ export const enviarInscripcion = async (req, res) => {
             filename: file.originalname,
             content: fileBuffer,
           });
-          console.log(`  ✓ ${file.originalname} (${(file.size / 1024).toFixed(2)} KB)`);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log(`  ✓ ${file.originalname} (${(file.size / 1024).toFixed(2)} KB)`);
+          }
         } catch (error) {
           console.error(`  ✗ Error leyendo ${file.originalname}:`, error);
         }
@@ -58,14 +62,13 @@ export const enviarInscripcion = async (req, res) => {
     }
 
     // 6. Enviar email con Resend
-    console.log('\n📧 Enviando email...');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('\n📧 Enviando email...');
+    }
     const { data, error } = await resend.emails.send(emailData);
 
     if (error) {
       console.error('❌ Error de Resend:', error);
-      
-      // Limpiar archivos temporales
-      await cleanupFiles(req.files);
       
       return res.status(500).json({
         success: false,
@@ -74,8 +77,10 @@ export const enviarInscripcion = async (req, res) => {
       });
     }
 
-    console.log('✅ Email enviado exitosamente!');
-    console.log(`   ID: ${data.id}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('✅ Email enviado exitosamente!');
+      console.log(`   ID: ${data.id}`);
+    }
 
     // 7. Enviar email de confirmación al estudiante (opcional)
     try {
@@ -85,10 +90,7 @@ export const enviarInscripcion = async (req, res) => {
       // No fallar si esto falla
     }
 
-    // 8. Limpiar archivos temporales
-    await cleanupFiles(req.files);
-
-    // 9. Responder con éxito
+    // 8. Responder con éxito
     return res.status(200).json({
       success: true,
       message: 'Inscripción enviada exitosamente',
@@ -99,16 +101,19 @@ export const enviarInscripcion = async (req, res) => {
   } catch (error) {
     console.error('❌ Error procesando inscripción:', error);
 
-    // Limpiar archivos en caso de error
-    if (req.files) {
-      await cleanupFiles(req.files);
-    }
-
     return res.status(500).json({
       success: false,
       message: 'Error procesando la solicitud',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  } finally {
+    // Siempre limpiar archivos temporales después de procesar (éxito o error)
+    if (req.files && req.files.length > 0) {
+      await cleanupFiles(req.files);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🧹 Archivos temporales eliminados');
+      }
+    }
   }
 };
 
@@ -228,6 +233,8 @@ www.institutoisdep.com.ar
     throw error;
   }
 
-  console.log(`✅ Confirmación enviada a ${formData.email}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`✅ Confirmación enviada a ${formData.email}`);
+  }
   return data;
 };

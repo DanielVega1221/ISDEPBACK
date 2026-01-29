@@ -153,14 +153,18 @@ app.use((err, req, res, next) => {
 // ============================================
 
 app.listen(PORT, () => {
-  console.log('╔════════════════════════════════════════╗');
-  console.log('║   🎓 ISDEP Backend API                 ║');
-  console.log('╠════════════════════════════════════════╣');
-  console.log(`║   🚀 Servidor corriendo en puerto ${PORT}  ║`);
-  console.log(`║   🌍 Entorno: ${process.env.NODE_ENV || 'development'}           ║`);
-  console.log(`║   📧 Resend API: ${process.env.RESEND_API_KEY ? '✓ Configurado' : '✗ No configurado'}    ║`);
-  console.log('╚════════════════════════════════════════╝');
-  console.log(`\n🔗 Health check: http://localhost:${PORT}/health\n`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('╔════════════════════════════════════════╗');
+    console.log('║   🎓 ISDEP Backend API                 ║');
+    console.log('╠════════════════════════════════════════╣');
+    console.log(`║   🚀 Servidor corriendo en puerto ${PORT}  ║`);
+    console.log(`║   🌍 Entorno: ${process.env.NODE_ENV || 'development'}           ║`);
+    console.log(`║   📧 Resend API: ${process.env.RESEND_API_KEY ? '✓ Configurado' : '✗ No configurado'}    ║`);
+    console.log('╚════════════════════════════════════════╝');
+    console.log(`\n🔗 Health check: http://localhost:${PORT}/health\n`);
+  } else {
+    console.log(`Server running on port ${PORT}`);
+  }
 });
 
 export default app;

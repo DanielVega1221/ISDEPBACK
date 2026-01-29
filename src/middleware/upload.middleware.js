@@ -107,7 +107,9 @@ export const validateImageFiles = async (req, res, next) => {
 
         validatedFiles.push(file);
       } catch (error) {
-        console.error(`Error validando archivo ${file.originalname}:`, error);
+        if (process.env.NODE_ENV !== 'production') {
+          console.error(`Error validando archivo ${file.originalname}:`, error);
+        }
         errors.push(`${file.originalname}: Error al procesar el archivo`);
         try {
           await fs.unlink(file.path);
@@ -132,7 +134,9 @@ export const validateImageFiles = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Error en validación de archivos:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error en validación de archivos:', error);
+    }
     
     // Limpiar archivos en caso de error
     if (req.files) {
@@ -163,9 +167,13 @@ export const cleanupFiles = async (files) => {
   for (const file of files) {
     try {
       await fs.unlink(file.path);
-      console.log(`✓ Archivo temporal eliminado: ${file.filename}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`✓ Archivo temporal eliminado: ${file.filename}`);
+      }
     } catch (error) {
-      console.error(`✗ Error eliminando archivo ${file.filename}:`, error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error(`✗ Error eliminando archivo ${file.filename}:`, error);
+      }
     }
   }
 };
