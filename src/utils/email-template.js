@@ -11,7 +11,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
   const warningsHTML = warnings && warnings.length > 0 
     ? `
     <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
-      <strong style="color: #856404;">⚠️ Advertencias:</strong>
+      <strong style="color: #856404;">Advertencias:</strong>
       <ul style="margin: 10px 0 0 0; padding-left: 20px;">
         ${warnings.map(w => `<li style="color: #856404;">${w}</li>`).join('')}
       </ul>
@@ -56,7 +56,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
           <tr>
             <td style="padding: 20px 30px; background-color: #f8f9fa; border-bottom: 2px solid #e9ecef;">
               <p style="margin: 0; color: #6c757d; font-size: 14px; text-align: center;">
-                📅 Recibido: ${new Date().toLocaleString('es-AR', { 
+                Recibido: ${new Date().toLocaleString('es-AR', { 
                   dateStyle: 'full', 
                   timeStyle: 'short',
                   timeZone: 'America/Argentina/Buenos_Aires'
@@ -88,8 +88,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
           <!-- Datos Personales -->
           <tr>
             <td style="padding: 30px;">
-              <h3 style="margin: 0 0 20px 0; color: #2d3561; font-size: 20px; font-weight: 700; display: flex; align-items: center;">
-                <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 18px;">👤</span>
+              <h3 style="margin: 0 0 20px 0; color: #2d3561; font-size: 20px; font-weight: 700; padding-bottom: 10px; border-bottom: 3px solid #667eea;">
                 Datos Personales
               </h3>
               
@@ -113,8 +112,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
           <!-- Datos de Contacto -->
           <tr>
             <td style="padding: 30px; background-color: #f8f9fa;">
-              <h3 style="margin: 0 0 20px 0; color: #2d3561; font-size: 20px; font-weight: 700; display: flex; align-items: center;">
-                <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 18px;">📧</span>
+              <h3 style="margin: 0 0 20px 0; color: #2d3561; font-size: 20px; font-weight: 700; padding-bottom: 10px; border-bottom: 3px solid #667eea;">
                 Datos de Contacto
               </h3>
               
@@ -146,8 +144,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
           <!-- Información Académica -->
           <tr>
             <td style="padding: 30px;">
-              <h3 style="margin: 0 0 20px 0; color: #2d3561; font-size: 20px; font-weight: 700; display: flex; align-items: center;">
-                <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 18px;">🎓</span>
+              <h3 style="margin: 0 0 20px 0; color: #2d3561; font-size: 20px; font-weight: 700; padding-bottom: 10px; border-bottom: 3px solid #667eea;">
                 Información Académica
               </h3>
               
@@ -160,8 +157,8 @@ export const generateEmailHTML = (formData, warnings = null) => {
                   <td style="color: #6c757d; font-size: 14px; font-weight: 600;">Conocimientos Previos:</td>
                   <td style="color: #2d3561; font-size: 15px; font-weight: 500;">
                     ${tieneConocimientosPrevios 
-                      ? '<span style="color: #28a745; font-weight: 600;">✓ Sí</span>' 
-                      : '<span style="color: #6c757d;">✗ No</span>'}
+                      ? '<span style="color: #28a745; font-weight: 600;">Sí</span>' 
+                      : '<span style="color: #6c757d;">No</span>'}
                   </td>
                 </tr>
               </table>
@@ -172,7 +169,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
           <tr>
             <td style="padding: 20px 30px; background-color: #e7f3ff; border-top: 2px solid #2d3561;">
               <p style="margin: 0; color: #004085; font-size: 14px; text-align: center;">
-                📎 Los archivos adjuntos (títulos, DNI, etc.) se encuentran incluidos en este email
+                Los archivos adjuntos (títulos, DNI, etc.) se encuentran incluidos en este email
               </p>
             </td>
           </tr>
@@ -186,10 +183,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
               <p style="margin: 0; font-size: 13px;">
                 Sistema Automatizado de Inscripciones
               </p>
-              <p style="margin: 15px 0 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                📧 <a href="mailto:isdep@hotmail.com.ar" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">isdep@hotmail.com.ar</a> • 
-                🌐 <a href="https://www.institutoisdep.com.ar" style="color: rgba(255, 255, 255, 0.8); text-decoration: none;">www.institutoisdep.com.ar</a>
-              </p>
+
             </td>
           </tr>
 
