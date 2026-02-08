@@ -12,25 +12,8 @@ const __dirname = dirname(__filename);
 // CONFIGURACIÓN DE MULTER
 // ============================================
 
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../uploads');
-    try {
-      await fs.access(uploadDir);
-    } catch {
-      await fs.mkdir(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    // Generar nombre único y seguro
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const sanitizedName = file.originalname
-      .replace(/[^a-zA-Z0-9.-]/g, '_') // Eliminar caracteres peligrosos
-      .toLowerCase();
-    cb(null, `inscripcion-${uniqueSuffix}-${sanitizedName}`);
-  }
-});
+// Usar memoryStorage en lugar de diskStorage para evitar problemas con sistemas de archivos efímeros (Render, Heroku, etc.)
+const storage = multer.memoryStorage();
 
 // Límites de archivos
 const limits = {
@@ -84,14 +67,12 @@ export const validateImageFiles = async (req, res, next) => {
       try {
         console.log(`  Validando: ${file.originalname} (${file.mimetype})`);
         
-        // Leer el archivo y verificar el tipo real
-        const buffer = await fs.readFile(file.path);
-        const fileType = await fileTypeFromBuffer(buffer);
+        // Con memoryStorage, el buffer ya está disponible en file.buffer
+        const fileType = await fileTypeFromBuffer(file.buffer);
 
         if (!fileType) {
           console.log(`  ✗ ${file.originalname}: No se pudo determinar el tipo`);
           errors.push(`${file.originalname}: No se pudo determinar el tipo de archivo`);
-          await fs.unlink(file.path); // Eliminar archivo inválido
           continue;
         }
 
@@ -100,7 +81,6 @@ export const validateImageFiles = async (req, res, next) => {
         if (!allowedTypes.includes(fileType.ext)) {
           console.log(`  ✗ ${file.originalname}: Tipo no permitido (${fileType.ext})`);
           errors.push(`${file.originalname}: Tipo de archivo no permitido (${fileType.ext}). Solo JPG, PNG y WebP.`);
-          await fs.unlink(file.path);
           continue;
         }
 
@@ -108,7 +88,6 @@ export const validateImageFiles = async (req, res, next) => {
         if (fileType.mime !== file.mimetype) {
           console.log(`  ✗ ${file.originalname}: MIME no coincide (${fileType.mime} vs ${file.mimetype})`);
           errors.push(`${file.originalname}: El archivo no coincide con su extensión declarada`);
-          await fs.unlink(file.path);
           continue;
         }
 
@@ -117,9 +96,6 @@ export const validateImageFiles = async (req, res, next) => {
       } catch (error) {
         console.error(`  ✗ Error validando ${file.originalname}:`, error.message);
         errors.push(`${file.originalname}: Error al procesar el archivo`);
-        try {
-          await fs.unlink(file.path);
-        } catch {}
       }
     }
 
@@ -166,22 +142,13 @@ export const validateImageFiles = async (req, res, next) => {
 // ============================================
 
 /**
- * Elimina archivos temporales después de enviar el email
+ * Con memoryStorage no hay archivos temporales que limpiar
+ * Esta función se mantiene para compatibilidad pero no hace nada
  */
 export const cleanupFiles = async (files) => {
-  if (!files || files.length === 0) return;
-
-  for (const file of files) {
-    try {
-      await fs.unlink(file.path);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`✓ Archivo temporal eliminado: ${file.filename}`);
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.error(`✗ Error eliminando archivo ${file.filename}:`, error);
-      }
-    }
+  // No hay archivos en disco que limpiar cuando usamos memoryStorage
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('✓ Limpieza de archivos omitida (usando memoryStorage)');
   }
 };
 

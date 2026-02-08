@@ -27,22 +27,21 @@ export const enviarInscripcion = async (req, res) => {
         name: f.originalname, 
         size: f.size,
         mimetype: f.mimetype,
-        path: f.path
+        hasBuffer: !!f.buffer
       })));
       
       for (const file of req.files) {
         try {
-          const fileBuffer = await fs.readFile(file.path);
-          
+          // Con memoryStorage, el buffer ya está disponible directamente
           const attachment = {
             filename: file.originalname,
-            content: fileBuffer,
+            content: file.buffer,
           };
           
           attachments.push(attachment);
-          console.log(`  ✓ ${file.originalname} (${(file.size / 1024).toFixed(2)} KB) - Buffer: ${fileBuffer.length} bytes`);
+          console.log(`  ✓ ${file.originalname} (${(file.size / 1024).toFixed(2)} KB) - Buffer: ${file.buffer.length} bytes`);
         } catch (error) {
-          console.error(`  ✗ Error leyendo ${file.originalname}:`, error);
+          console.error(`  ✗ Error procesando ${file.originalname}:`, error);
         }
       }
       
