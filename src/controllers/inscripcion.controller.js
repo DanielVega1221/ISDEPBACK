@@ -22,24 +22,33 @@ export const enviarInscripcion = async (req, res) => {
     // 3. Preparar archivos adjuntos
     const attachments = [];
     if (req.files && req.files.length > 0) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`📎 Procesando ${req.files.length} archivo(s) adjunto(s)...`);
-      }
+      console.log(`📎 Procesando ${req.files.length} archivo(s) adjunto(s)...`);
+      console.log('Archivos recibidos:', req.files.map(f => ({ 
+        name: f.originalname, 
+        size: f.size,
+        mimetype: f.mimetype,
+        path: f.path
+      })));
       
       for (const file of req.files) {
         try {
           const fileBuffer = await fs.readFile(file.path);
-          attachments.push({
+          
+          const attachment = {
             filename: file.originalname,
             content: fileBuffer,
-          });
-          if (process.env.NODE_ENV !== 'production') {
-            console.log(`  ✓ ${file.originalname} (${(file.size / 1024).toFixed(2)} KB)`);
-          }
+          };
+          
+          attachments.push(attachment);
+          console.log(`  ✓ ${file.originalname} (${(file.size / 1024).toFixed(2)} KB) - Buffer: ${fileBuffer.length} bytes`);
         } catch (error) {
           console.error(`  ✗ Error leyendo ${file.originalname}:`, error);
         }
       }
+      
+      console.log(`📎 Total de adjuntos preparados para enviar: ${attachments.length}`);
+    } else {
+      console.log('📎 No se recibieron archivos adjuntos');
     }
 
     // 4. Generar contenido del email
@@ -50,7 +59,7 @@ export const enviarInscripcion = async (req, res) => {
     const emailData = {
       from: resendConfig.from,
       to: resendConfig.to,
-      replyTo: resendConfig.replyTo, // Las respuestas van a Proton Mail
+      replyTo: resendConfig.replyTo,
       subject: `Nueva Inscripción: ${formData.nombre} ${formData.apellido} - ${formData.formacionSolicitada}`,
       html: emailHTML,
       text: emailText,
@@ -59,16 +68,29 @@ export const enviarInscripcion = async (req, res) => {
     // Agregar adjuntos si existen
     if (attachments.length > 0) {
       emailData.attachments = attachments;
+      console.log(`📎 Se agregarán ${attachments.length} archivo(s) adjunto(s) al email`);
+      console.log('Detalles de adjuntos:', attachments.map(a => ({
+        filename: a.filename,
+        size: a.content.length
+      })));
+    } else {
+      console.log('📎 Email sin archivos adjuntos');
     }
 
     // 6. Enviar email con Resend
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('\n📧 Enviando email...');
-    }
+    console.log('\n📧 Enviando email a Resend...');
+    console.log('Configuración del email:', {
+      from: emailData.from,
+      to: emailData.to,
+      subject: emailData.subject,
+      attachmentsCount: emailData.attachments?.length || 0
+    });
+    
     const { data, error } = await resend.emails.send(emailData);
 
     if (error) {
       console.error('❌ Error de Resend:', error);
+      console.error('Error completo:', JSON.stringify(error, null, 2));
       
       return res.status(500).json({
         success: false,
@@ -77,9 +99,10 @@ export const enviarInscripcion = async (req, res) => {
       });
     }
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('✅ Email enviado exitosamente!');
-      console.log(`   ID: ${data.id}`);
+    console.log('✅ Email enviado exitosamente a Resend!');
+    console.log(`   ID: ${data.id}`);
+    if (attachments.length > 0) {
+      console.log(`   Con ${attachments.length} archivo(s) adjunto(s)`);
     }
 
     // 7. Responder con éxito
@@ -102,9 +125,7 @@ export const enviarInscripcion = async (req, res) => {
     // Siempre limpiar archivos temporales después de procesar (éxito o error)
     if (req.files && req.files.length > 0) {
       await cleanupFiles(req.files);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('🧹 Archivos temporales eliminados');
-      }
+      console.log(`🧹 ${req.files.length} archivo(s) temporal(es) eliminado(s)`);
     }
   }
 };

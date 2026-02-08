@@ -10,6 +10,31 @@ import {
 const router = express.Router();
 
 // ============================================
+// MIDDLEWARE DE DEBUG
+// ============================================
+
+// Middleware para loggear los archivos recibidos por Multer
+const logMulterFiles = (req, res, next) => {
+  console.log('\n' + '='.repeat(60));
+  console.log('📥 NUEVA SOLICITUD DE INSCRIPCIÓN');
+  console.log('='.repeat(60));
+  console.log('Timestamp:', new Date().toISOString());
+  console.log('Body keys:', Object.keys(req.body));
+  console.log('Files received by Multer:', req.files ? req.files.length : 0);
+  if (req.files && req.files.length > 0) {
+    console.log('Files details:');
+    req.files.forEach((file, index) => {
+      console.log(`  [${index + 1}] ${file.originalname}`);
+      console.log(`      Size: ${(file.size / 1024).toFixed(2)} KB`);
+      console.log(`      Type: ${file.mimetype}`);
+      console.log(`      Path: ${file.path}`);
+    });
+  }
+  console.log('='.repeat(60) + '\n');
+  next();
+};
+
+// ============================================
 // RUTAS DE INSCRIPCIÓN
 // ============================================
 
@@ -34,11 +59,12 @@ const router = express.Router();
 router.post(
   '/',
   uploadMiddleware,              // 1. Procesar archivos con Multer
-  validateImageFiles,            // 2. Validar archivos (magic bytes, etc.)
-  sanitizeInscripcionData,       // 3. Sanitizar datos del formulario
-  inscripcionValidationRules,    // 4. Reglas de validación
-  validate,                      // 5. Ejecutar validación
-  enviarInscripcion              // 6. Controlador principal
+  logMulterFiles,                // 2. Debug: Ver qué recibió Multer
+  validateImageFiles,            // 3. Validar archivos (magic bytes, etc.)
+  sanitizeInscripcionData,       // 4. Sanitizar datos del formulario
+  inscripcionValidationRules,    // 5. Reglas de validación
+  validate,                      // 6. Ejecutar validación
+  enviarInscripcion              // 7. Controlador principal
 );
 
 // Ruta de prueba (solo desarrollo)

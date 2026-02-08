@@ -72,19 +72,24 @@ export const validateImageFiles = async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) {
       // No hay archivos, permitir continuar (son opcionales)
+      console.log('✓ Validación: No hay archivos para validar (opcionales)');
       return next();
     }
 
+    console.log(`🔍 Validando ${req.files.length} archivo(s)...`);
     const validatedFiles = [];
     const errors = [];
 
     for (const file of req.files) {
       try {
+        console.log(`  Validando: ${file.originalname} (${file.mimetype})`);
+        
         // Leer el archivo y verificar el tipo real
         const buffer = await fs.readFile(file.path);
         const fileType = await fileTypeFromBuffer(buffer);
 
         if (!fileType) {
+          console.log(`  ✗ ${file.originalname}: No se pudo determinar el tipo`);
           errors.push(`${file.originalname}: No se pudo determinar el tipo de archivo`);
           await fs.unlink(file.path); // Eliminar archivo inválido
           continue;
@@ -93,6 +98,7 @@ export const validateImageFiles = async (req, res, next) => {
         // Verificar que sea realmente una imagen
         const allowedTypes = ['jpg', 'jpeg', 'png', 'webp'];
         if (!allowedTypes.includes(fileType.ext)) {
+          console.log(`  ✗ ${file.originalname}: Tipo no permitido (${fileType.ext})`);
           errors.push(`${file.originalname}: Tipo de archivo no permitido (${fileType.ext}). Solo JPG, PNG y WebP.`);
           await fs.unlink(file.path);
           continue;
@@ -100,22 +106,24 @@ export const validateImageFiles = async (req, res, next) => {
 
         // Verificar que el MIME type coincida
         if (fileType.mime !== file.mimetype) {
+          console.log(`  ✗ ${file.originalname}: MIME no coincide (${fileType.mime} vs ${file.mimetype})`);
           errors.push(`${file.originalname}: El archivo no coincide con su extensión declarada`);
           await fs.unlink(file.path);
           continue;
         }
 
         validatedFiles.push(file);
+        console.log(`  ✓ ${file.originalname} validado correctamente`);
       } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.error(`Error validando archivo ${file.originalname}:`, error);
-        }
+        console.error(`  ✗ Error validando ${file.originalname}:`, error.message);
         errors.push(`${file.originalname}: Error al procesar el archivo`);
         try {
           await fs.unlink(file.path);
         } catch {}
       }
     }
+
+    console.log(`✓ Validación completa: ${validatedFiles.length} válido(s), ${errors.length} error(es)`);
 
     if (errors.length > 0 && validatedFiles.length === 0) {
       return res.status(400).json({
@@ -130,13 +138,12 @@ export const validateImageFiles = async (req, res, next) => {
     
     if (errors.length > 0) {
       req.fileValidationWarnings = errors;
+      console.log('⚠️ Warnings de validación:', errors);
     }
 
     next();
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error en validación de archivos:', error);
-    }
+    console.error('❌ Error en validación de archivos:', error);
     
     // Limpiar archivos en caso de error
     if (req.files) {
