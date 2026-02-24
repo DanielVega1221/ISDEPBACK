@@ -5,7 +5,8 @@ export const generateEmailHTML = (formData, warnings = null) => {
   const { 
     nombre, apellido, dni, fechaNacimiento, 
     email, telefono, pais, ciudad, 
-    profesion, formacionSolicitada, tieneConocimientosPrevios 
+    profesion, formacionSolicitada, tieneConocimientosPrevios,
+    observacion
   } = formData;
 
   const warningsHTML = warnings && warnings.length > 0 
@@ -165,6 +166,20 @@ export const generateEmailHTML = (formData, warnings = null) => {
             </td>
           </tr>
 
+          ${observacion ? `
+          <!-- Observaciones -->
+          <tr>
+            <td style="padding: 30px; background-color: #fff8e1; border-top: 2px solid #ffc107;">
+              <h3 style="margin: 0 0 15px 0; color: #2d3561; font-size: 18px; font-weight: 700;">
+                <span style="color: #f57c00;">⚠️</span> Observaciones del Solicitante
+              </h3>
+              <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #ffc107; border-radius: 4px;">
+                <p style="margin: 0; color: #2d3561; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${observacion}</p>
+              </div>
+            </td>
+          </tr>
+          ` : ''}
+
           <!-- Nota sobre archivos adjuntos -->
           <tr>
             <td style="padding: 20px 30px; background-color: #e7f3ff; border-top: 2px solid #2d3561;">
@@ -203,7 +218,8 @@ export const generateEmailText = (formData) => {
   const { 
     nombre, apellido, dni, fechaNacimiento, 
     email, telefono, pais, ciudad, 
-    profesion, formacionSolicitada, tieneConocimientosPrevios 
+    profesion, formacionSolicitada, tieneConocimientosPrevios,
+    observacion
   } = formData;
 
   return `
@@ -239,7 +255,12 @@ INFORMACIÓN ACADÉMICA
   Profesión/Ocupación:    ${profesion}
   Conocimientos Previos:  ${tieneConocimientosPrevios ? 'Sí' : 'No'}
 
+${observacion ? `
+OBSERVACIONES DEL SOLICITANTE
+───────────────────────────────────────────────────
+${observacion}
 
+` : ''}
 ═══════════════════════════════════════════════════
 Los archivos adjuntos están incluidos en este email.
 

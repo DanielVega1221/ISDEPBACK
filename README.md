@@ -13,6 +13,9 @@ Backend API para el sistema de inscripciones del Instituto ISDEP. Desarrollado c
 - ✅ **CORS configurado** - Solo dominios permitidos
 - ✅ **Confirmación automática** - Email de confirmación al estudiante
 
+> **💡 Tip importante:** Si deployás en Render (gratis), tu backend se dormirá después de 15 min. 
+> Usá [UptimeRobot](https://uptimerobot.com) (gratis) para mantenerlo despierto. Ver [KEEP_ALIVE.md](./KEEP_ALIVE.md)
+
 ## 📋 Requisitos
 
 - Node.js >= 18.0.0
@@ -250,7 +253,24 @@ Para usar tu dominio `@institutoisdep.com.ar`:
 
 Mientras tanto, puedes usar `onboarding@resend.dev` para testing.
 
-## 🐛 Troubleshooting
+## � Mantener el Backend Activo en Render (Gratis)
+
+Render **GRATIS** pone tu servicio a dormir después de 15 minutos de inactividad, causando un "cold start" de ~30 segundos en la primera request.
+
+**Solución Recomendada:** Usar **UptimeRobot** (gratis para siempre)
+
+### Setup rápido (2 minutos):
+
+1. Registrate en [uptimerobot.com](https://uptimerobot.com)
+2. Agregar monitor:
+   - **Monitor Type**: HTTP(s)
+   - **URL**: `https://isdepback.onrender.com/health`
+   - **Interval**: 5 minutes
+3. ¡Backend siempre activo! 🎉
+
+📖 **Ver guía completa:** [KEEP_ALIVE.md](./KEEP_ALIVE.md) - Incluye 4 opciones gratuitas diferentes.
+
+## �🐛 Troubleshooting
 
 ### Error: "No permitido por CORS"
 - Verifica que el origen esté en `ALLOWED_ORIGINS`

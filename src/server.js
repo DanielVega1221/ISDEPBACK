@@ -40,8 +40,9 @@ const vercelPattern = /\.vercel\.app$/;
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir requests sin origin (como Postman) en desarrollo
-    if (!origin && process.env.NODE_ENV === 'development') {
+    // Permitir requests sin origin (como Postman, UptimeRobot, curl, etc.)
+    // Estos servicios de monitoring y herramientas no envían el header Origin
+    if (!origin) {
       return callback(null, true);
     }
     

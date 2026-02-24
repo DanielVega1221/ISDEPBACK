@@ -95,7 +95,14 @@ export const inscripcionValidationRules = [
   body('tieneConocimientosPrevios')
     .optional()
     .isBoolean().withMessage('Valor inválido para conocimientos previos')
-    .toBoolean()
+    .toBoolean(),
+
+  // Observación (opcional, texto)
+  body('observacion')
+    .optional()
+    .trim()
+    .isLength({ max: 500 }).withMessage('La observación no puede superar los 500 caracteres')
+    .escape()
 ];
 
 // ============================================
@@ -135,7 +142,8 @@ export const sanitizeInscripcionData = (req, res, next) => {
     const allowedFields = [
       'nombre', 'apellido', 'dni', 'fechaNacimiento',
       'email', 'telefono', 'pais', 'ciudad',
-      'profesion', 'formacionSolicitada', 'tieneConocimientosPrevios'
+      'profesion', 'formacionSolicitada', 'tieneConocimientosPrevios',
+      'observacion'
     ];
 
     Object.keys(req.body).forEach(key => {
