@@ -1,4 +1,17 @@
 /**
+ * Escapa caracteres HTML especiales para prevenir inyección en el template del email
+ */
+const escapeHtml = (str) => {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+};
+
+/**
  * Genera el template HTML profesional para el email de inscripción
  */
 export const generateEmailHTML = (formData, warnings = null) => {
@@ -81,7 +94,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
                 Formación Solicitada
               </p>
               <h2 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
-                ${formacionSolicitada}
+                ${escapeHtml(formacionSolicitada)}
               </h2>
             </td>
           </tr>
@@ -152,7 +165,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
               <table width="100%" cellpadding="8" cellspacing="0">
                 <tr style="border-bottom: 1px solid #e9ecef;">
                   <td style="color: #6c757d; font-size: 14px; font-weight: 600; width: 40%;">Nivel de educación:</td>
-                  <td style="color: #2d3561; font-size: 15px; font-weight: 500;">${profesion}</td>
+                  <td style="color: #2d3561; font-size: 15px; font-weight: 500;">${escapeHtml(profesion)}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #e9ecef;">
                   <td style="color: #6c757d; font-size: 14px; font-weight: 600;">Conocimientos Previos:</td>
@@ -174,7 +187,7 @@ export const generateEmailHTML = (formData, warnings = null) => {
                 <span style="color: #f57c00;">⚠️</span> Observaciones del Solicitante
               </h3>
               <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #ffc107; border-radius: 4px;">
-                <p style="margin: 0; color: #2d3561; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${observacion}</p>
+                <p style="margin: 0; color: #2d3561; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(observacion)}</p>
               </div>
             </td>
           </tr>

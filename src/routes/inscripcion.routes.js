@@ -4,7 +4,8 @@ import { uploadMiddleware, validateImageFiles } from '../middleware/upload.middl
 import { 
   inscripcionValidationRules, 
   validate, 
-  sanitizeInscripcionData 
+  sanitizeInscripcionData,
+  botProtectionMiddleware
 } from '../middleware/validation.middleware.js';
 
 const router = express.Router();
@@ -27,7 +28,6 @@ const logMulterFiles = (req, res, next) => {
       console.log(`  [${index + 1}] ${file.originalname}`);
       console.log(`      Size: ${(file.size / 1024).toFixed(2)} KB`);
       console.log(`      Type: ${file.mimetype}`);
-      console.log(`      Path: ${file.path}`);
     });
   }
   console.log('='.repeat(60) + '\n');
@@ -59,12 +59,13 @@ const logMulterFiles = (req, res, next) => {
 router.post(
   '/',
   uploadMiddleware,              // 1. Procesar archivos con Multer
-  logMulterFiles,                // 2. Debug: Ver qué recibió Multer
-  validateImageFiles,            // 3. Validar archivos (magic bytes, etc.)
-  sanitizeInscripcionData,       // 4. Sanitizar datos del formulario
-  inscripcionValidationRules,    // 5. Reglas de validación
-  validate,                      // 6. Ejecutar validación
-  enviarInscripcion              // 7. Controlador principal
+  botProtectionMiddleware,       // 2. Protección anti-bots (honeypot + tiempo)
+  logMulterFiles,                // 3. Debug: Ver qué recibió Multer
+  validateImageFiles,            // 4. Validar archivos (magic bytes, etc.)
+  sanitizeInscripcionData,       // 5. Sanitizar datos del formulario
+  inscripcionValidationRules,    // 6. Reglas de validación
+  validate,                      // 7. Ejecutar validación
+  enviarInscripcion              // 8. Controlador principal
 );
 
 // Ruta de prueba (solo desarrollo)

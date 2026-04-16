@@ -18,13 +18,15 @@ export const enviarInscripcion = async (req, res) => {
 
     // 2. Obtener datos del formulario
     const formData = req.body;
-    console.log('📋 Datos del formulario recibidos:', {
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      email: formData.email,
-      formacionSolicitada: formData.formacionSolicitada,
-      observacion: formData.observacion || '(sin observaciones)'
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('📋 Datos del formulario recibidos:', {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        email: formData.email,
+        formacionSolicitada: formData.formacionSolicitada,
+        observacion: formData.observacion || '(sin observaciones)'
+      });
+    }
     
     // 3. Preparar archivos adjuntos
     const attachments = [];

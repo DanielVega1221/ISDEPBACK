@@ -65,15 +65,14 @@ app.use(cors({
 
 // Rate Limiting - Protección contra ataques de fuerza bruta
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // Máximo 5 solicitudes por IP
+  windowMs: 60 * 60 * 1000, // 1 hora
+  max: 20, // Máximo 20 solicitudes por IP por hora (protege cuota de Resend)
   message: {
     success: false,
-    message: 'Demasiadas solicitudes desde esta IP. Por favor, intenta de nuevo en 15 minutos.'
+    message: 'Demasiadas solicitudes desde esta IP. Por favor, intenta de nuevo en una hora.'
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Skip en desarrollo para facilitar testing
   skip: (req) => process.env.NODE_ENV === 'development' && req.ip === '::1'
 });
 
