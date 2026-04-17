@@ -12,13 +12,14 @@ export const botProtectionMiddleware = (req, res, next) => {
     return res.status(200).json({ success: true, message: 'Inscripción enviada exitosamente' });
   }
 
-  // Tiempo mínimo de llenado: un humano tarda más de 8 segundos
+  // Tiempo mínimo de llenado: un bot que no simula delay no puede tardar más de 2 segundos.
+  // 2s es suficiente para bloquear submit instantáneo sin afectar usuarios rápidos o autofill.
   const formLoadTime = parseInt(req.body._t, 10);
   if (formLoadTime && !isNaN(formLoadTime)) {
     const elapsed = Date.now() - formLoadTime;
-    // Solo bloquear si el tiempo es plausiblemente rápido (0-8s).
+    // Solo bloquear si el tiempo es plausiblemente rápido (0-2s).
     // Si elapsed es negativo el reloj del cliente está adelantado: dejar pasar.
-    if (elapsed >= 0 && elapsed < 8000) {
+    if (elapsed >= 0 && elapsed < 2000) {
       return res.status(200).json({ success: true, message: 'Inscripción enviada exitosamente' });
     }
   }

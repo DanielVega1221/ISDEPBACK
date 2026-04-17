@@ -7,6 +7,7 @@ import {
   sanitizeInscripcionData,
   botProtectionMiddleware
 } from '../middleware/validation.middleware.js';
+import { idempotencyMiddleware } from '../middleware/idempotency.middleware.js';
 
 const router = express.Router();
 
@@ -60,12 +61,13 @@ router.post(
   '/',
   uploadMiddleware,              // 1. Procesar archivos con Multer
   botProtectionMiddleware,       // 2. Protección anti-bots (honeypot + tiempo)
-  logMulterFiles,                // 3. Debug: Ver qué recibió Multer
-  validateImageFiles,            // 4. Validar archivos (magic bytes, etc.)
-  sanitizeInscripcionData,       // 5. Sanitizar datos del formulario
-  inscripcionValidationRules,    // 6. Reglas de validación
-  validate,                      // 7. Ejecutar validación
-  enviarInscripcion              // 8. Controlador principal
+  idempotencyMiddleware,         // 3. Prevenir envíos duplicados
+  logMulterFiles,                // 4. Debug: Ver qué recibió Multer
+  validateImageFiles,            // 5. Validar archivos (magic bytes, etc.)
+  sanitizeInscripcionData,       // 6. Sanitizar datos del formulario
+  inscripcionValidationRules,    // 7. Reglas de validación
+  validate,                      // 8. Ejecutar validación
+  enviarInscripcion              // 9. Controlador principal
 );
 
 // Ruta de prueba (solo desarrollo)
